@@ -1,13 +1,11 @@
 {
   "name": "rul",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An abstraction designed to control any kind of list-like object",
   "main": "main.js",
   "dependencies": {
     "detacher": ""
   },
-
-
   "devDependencies": {
     "u-test": "",
     "istanbul": "",
@@ -17,8 +15,6 @@
   "scripts": {
     "test": "bash test.sh"
   },
-
-
   "repository": {
     "type": "git",
     "url": "git://github.com/manvalls/rul.git"
