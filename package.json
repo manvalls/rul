@@ -1,0 +1,31 @@
+{
+  "name": "rul",
+  "version": "1.0.0",
+  "description": "An abstraction designed to control any kind of list-like object",
+  "main": "main.js",
+  "dependencies": {
+    "detacher": ""
+  },
+
+
+  "devDependencies": {
+    "u-test": "",
+    "istanbul": "",
+    "coveralls": "^2",
+    "y-timers": ""
+  },
+  "scripts": {
+    "test": "bash test.sh"
+  },
+
+
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/manvalls/rul.git"
+  },
+  "bugs": {
+    "url": "https://github.com/manvalls/rul/issues"
+  },
+  "author": "Manuel Valls Fernández <manolo@vlrz.es>",
+  "license": "LGPL-3.0"
+}
