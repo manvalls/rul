@@ -75,10 +75,7 @@ class Rul{
   }
 
   clear(){
-    var l = this[length],
-        i;
-
-    for(i = 0;i < l;i++) this.remove(0);
+    this.remove(0,this[length]);
   }
 
   move(from,to){
