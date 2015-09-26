@@ -9,6 +9,10 @@ t('Rul',function(){
     var rul = new Rul(),
         obj = {};
 
+    assert(Rul.is(rul));
+    assert(!Rul.is(null));
+    assert(!Rul.is({}));
+    
     rul.add(1);
     rul.add(obj);
     rul.add(obj);
@@ -205,7 +209,7 @@ t('Rul',function(){
     str = '';
     for(v of rul) str += v;
     assert.notStrictEqual(str,arr.join(''));
-    
+
   });
 
 });

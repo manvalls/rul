@@ -1,6 +1,7 @@
 /**/ "use strict" /**/
 var Detacher = require('detacher'),
 
+    isRul = '3Vvw4Kb8NwR1Y74',
     volatile = Symbol(),
     consumable = Symbol(),
     consumers = Symbol(),
@@ -8,6 +9,10 @@ var Detacher = require('detacher'),
     list = Symbol();
 
 class Rul{
+
+  static is(obj){
+    return !!(obj && obj[isRul]);
+  }
 
   constructor(vol){
     this[volatile] = !!vol;
@@ -119,6 +124,7 @@ class Rul{
   get consumable(){ return this[consumable]; }
   get volatile(){ return this[volatile]; }
   get length(){ return this[length]; }
+  get [isRul](){ return true; }
 
 }
 
