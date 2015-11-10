@@ -4,13 +4,13 @@
   "description": "An abstraction designed to control any kind of list-like object",
   "main": "main.js",
   "dependencies": {
-    "detacher": ""
+    "detacher": "^1.4.0"
   },
   "devDependencies": {
-    "u-test": "",
-    "istanbul": "",
-    "coveralls": "^2",
-    "y-timers": ""
+    "coveralls": "^2.11.4",
+    "istanbul": "^0.4.0",
+    "u-test": "^2.2.3",
+    "y-timers": "^1.1.0"
   },
   "scripts": {
     "test": "bash test.sh"
