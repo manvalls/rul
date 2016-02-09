@@ -6,7 +6,8 @@ var Detacher = require('detacher'),
     consumable = Symbol(),
     consumers = Symbol(),
     length = Symbol(),
-    list = Symbol();
+    list = Symbol(),
+    readOnly = Symbol();
 
 class Rul{
 
@@ -50,6 +51,7 @@ class Rul{
   add(elem,index){
     var c;
 
+    if(this[readOnly]) return;
     if(arguments.length == 1) index = this[length];
     else index = Math.round(Math.max(0,Math.min(this[length],index)));
 
@@ -67,6 +69,7 @@ class Rul{
   remove(index,num){
     var c;
 
+    if(this[readOnly]) return;
     index = Math.round(Math.max(0,Math.min(this[length] - 1,index)));
     if(arguments.length == 1) num = 1;
     else num = Math.round(Math.max(0,Math.min(this[length] - index,num)));
@@ -86,6 +89,7 @@ class Rul{
   move(from,to){
     var c,elem;
 
+    if(this[readOnly]) return;
     from = Math.round(Math.max(0,Math.min(this[length] - 1,from)));
     to = Math.round(Math.max(0,Math.min(this[length] - 1,to)));
 
@@ -121,6 +125,30 @@ class Rul{
     return new Detacher(detach,[arguments,this]);
   }
 
+  map(map,thisArg){
+    var rul = new Rul();
+
+    this.consume(mapAdd,forwardRemove,forwardMove,{
+      destination: rul,
+      thisArg: thisArg,
+      map: map
+    });
+
+    rul[readOnly] = true;
+    return rul;
+  }
+
+  readOnly(){
+    var rul = new Rul();
+
+    this.consume(forwardAdd,forwardRemove,forwardMove,{
+      destination: rul
+    });
+
+    rul[readOnly] = true;
+    return rul;
+  }
+
   get consumable(){ return this[consumable]; }
   get volatile(){ return this[volatile]; }
   get length(){ return this[length]; }
@@ -139,6 +167,33 @@ function evaporate(rul){
 
 function detach(args,rul){
   rul[consumers].delete(args);
+}
+
+function mapAdd(elem,index){
+  try{ elem = this.map.call(this.thisArg,elem); }
+  catch(e){ }
+
+  this.destination[readOnly] = false;
+  this.destination.add(elem,index);
+  this.destination[readOnly] = true;
+}
+
+function forwardAdd(elem,index){
+  this.destination[readOnly] = false;
+  this.destination.add(elem,index);
+  this.destination[readOnly] = true;
+}
+
+function forwardRemove(index,num){
+  this.destination[readOnly] = false;
+  this.destination.remove(index,num);
+  this.destination[readOnly] = true;
+}
+
+function forwardMove(from,to){
+  this.destination[readOnly] = false;
+  this.destination.move(from,to);
+  this.destination[readOnly] = true;
 }
 
 /*/ exports /*/

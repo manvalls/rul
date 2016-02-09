@@ -12,7 +12,7 @@ t('Rul',function(){
     assert(Rul.is(rul));
     assert(!Rul.is(null));
     assert(!Rul.is({}));
-    
+
     rul.add(1);
     rul.add(obj);
     rul.add(obj);
@@ -93,7 +93,7 @@ t('Rul',function(){
         v;
 
     rul.add(1);
-    for(v of rul) str += v;
+    for(v of rul.readOnly()) str += v;
     assert.strictEqual(str,'1');
 
   });
@@ -176,12 +176,12 @@ t('Rul',function(){
 
   });
 
-  t('consume',function(){
+  t('map and consume',function(){
     var rul = new Rul(),
         arr = [],
         v,d,str;
 
-    d = rul.consume(function add(elem,index){
+    d = rul.map(n => n + 1).consume(function add(elem,index){
       arr.splice(index,0,elem);
     },function remove(index,num){
       arr.splice(index,num);
@@ -196,7 +196,7 @@ t('Rul',function(){
     rul.add(6);
 
     str = '';
-    for(v of rul) str += v;
+    for(v of rul) str += v + 1;
     assert.strictEqual(str,arr.join(''));
 
     d.detach();
@@ -207,7 +207,7 @@ t('Rul',function(){
     rul.add(6);
 
     str = '';
-    for(v of rul) str += v;
+    for(v of rul) str += v + 1;
     assert.notStrictEqual(str,arr.join(''));
 
   });
