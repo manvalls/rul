@@ -23,6 +23,21 @@ class Rul{
     this[consumers] = new Set();
   }
 
+  add(elem,index){
+    if(this[readOnly]) return;
+    add.apply(this,arguments);
+  }
+
+  move(){
+    if(this[readOnly]) return;
+    move.apply(this,arguments);
+  }
+
+  remove(index,num){
+    if(this[readOnly]) return;
+    remove.apply(this,arguments);
+  }
+
   indexOf(elem){
     if(!this[consumable]) return -1;
     return this[list].indexOf(elem);
@@ -48,57 +63,13 @@ class Rul{
     for(elem of it) this.add(elem);
   }
 
-  add(elem,index){
-    var c;
-
-    if(this[readOnly]) return;
-    if(arguments.length == 1) index = this[length];
-    else index = Math.round(Math.max(0,Math.min(this[length],index)));
-
-    this[length]++;
-    if(this[consumable]) this[list].splice(index,0,elem);
-    for(c of this[consumers]) c[0].call(c[3],elem,index);
-
-  }
-
   replace(index,elem){
     if(index < this[length] && index >= 0) this.remove(index);
     this.add(elem,index);
   }
 
-  remove(index,num){
-    var c;
-
-    if(this[readOnly]) return;
-    index = Math.round(Math.max(0,Math.min(this[length] - 1,index)));
-    if(arguments.length == 1) num = 1;
-    else num = Math.round(Math.max(0,Math.min(this[length] - index,num)));
-
-    if(!num) return;
-    this[length] -= num;
-
-    if(this[consumable]) this[list].splice(index,num);
-    for(c of this[consumers]) c[1].call(c[3],index,num);
-
-  }
-
   clear(){
     this.remove(0,this[length]);
-  }
-
-  move(from,to){
-    var c,elem;
-
-    if(this[readOnly]) return;
-    from = Math.round(Math.max(0,Math.min(this[length] - 1,from)));
-    to = Math.round(Math.max(0,Math.min(this[length] - 1,to)));
-
-    if(this[consumable]){
-      elem = this[list].splice(from,1)[0];
-      this[list].splice(to,0,elem);
-    }
-
-    for(c of this[consumers]) c[2].call(c[3],from,to);
   }
 
   swap(from,to){
@@ -126,25 +97,20 @@ class Rul{
   }
 
   map(map,thisArg){
-    var rul = new Rul();
+    var rul = new Rul(this[volatile]);
 
-    this.consume(mapAdd,forwardRemove,forwardMove,{
-      destination: rul,
-      thisArg: thisArg,
-      map: map
-    });
-
+    rul.mapFn = map;
+    rul.thisArg = thisArg;
     rul[readOnly] = true;
+    
+    this.consume(mapAdd,remove,move,rul);
     return rul;
   }
 
   readOnly(){
-    var rul = new Rul();
+    var rul = new Rul(this[volatile]);
 
-    this.consume(forwardAdd,forwardRemove,forwardMove,{
-      destination: rul
-    });
-
+    this.consume(add,remove,move,rul);
     rul[readOnly] = true;
     return rul;
   }
@@ -158,6 +124,51 @@ class Rul{
 
 // - utils
 
+// -- main methods
+
+function add(elem,index){
+  var c;
+
+  if(arguments.length == 1) index = this[length];
+  else index = Math.round(Math.max(0,Math.min(this[length],index)));
+
+  this[length]++;
+  if(this[consumable]) this[list].splice(index,0,elem);
+  for(c of this[consumers]) c[0].call(c[3],elem,index);
+
+}
+
+function remove(index,num){
+  var c;
+
+  index = Math.round(Math.max(0,Math.min(this[length] - 1,index)));
+  if(arguments.length == 1) num = 1;
+  else num = Math.round(Math.max(0,Math.min(this[length] - index,num)));
+
+  if(!num) return;
+  this[length] -= num;
+
+  if(this[consumable]) this[list].splice(index,num);
+  for(c of this[consumers]) c[1].call(c[3],index,num);
+
+}
+
+function move(from,to){
+  var c,elem;
+
+  from = Math.round(Math.max(0,Math.min(this[length] - 1,from)));
+  to = Math.round(Math.max(0,Math.min(this[length] - 1,to)));
+
+  if(this[consumable]){
+    elem = this[list].splice(from,1)[0];
+    this[list].splice(to,0,elem);
+  }
+
+  for(c of this[consumers]) c[2].call(c[3],from,to);
+}
+
+// -- helpers
+
 function* noop(){}
 
 function evaporate(rul){
@@ -170,30 +181,10 @@ function detach(args,rul){
 }
 
 function mapAdd(elem,index){
-  try{ elem = this.map.call(this.thisArg,elem); }
+  try{ elem = this.mapFn.call(this.thisArg,elem); }
   catch(e){ }
 
-  this.destination[readOnly] = false;
-  this.destination.add(elem,index);
-  this.destination[readOnly] = true;
-}
-
-function forwardAdd(elem,index){
-  this.destination[readOnly] = false;
-  this.destination.add(elem,index);
-  this.destination[readOnly] = true;
-}
-
-function forwardRemove(index,num){
-  this.destination[readOnly] = false;
-  this.destination.remove(index,num);
-  this.destination[readOnly] = true;
-}
-
-function forwardMove(from,to){
-  this.destination[readOnly] = false;
-  this.destination.move(from,to);
-  this.destination[readOnly] = true;
+  add.call(this,elem,index);
 }
 
 /*/ exports /*/
