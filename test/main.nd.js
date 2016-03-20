@@ -93,7 +93,7 @@ t('Rul',function(){
         v;
 
     rul.add(1);
-    for(v of rul.readOnly()) str += v;
+    for(v of rul) str += v;
     assert.strictEqual(str,'1');
 
   });
@@ -176,12 +176,12 @@ t('Rul',function(){
 
   });
 
-  t('map and consume',function(){
+  t('consume',function(){
     var rul = new Rul(),
         arr = [],
-        mapped,v,d,str;
+        v,d,str;
 
-    d = (mapped = rul.map(n => n + 1)).consume(function add(elem,index){
+    d = rul.consume(function add(elem,index){
       arr.splice(index,0,elem);
     },function remove(index,num){
       arr.splice(index,num);
@@ -194,12 +194,9 @@ t('Rul',function(){
     rul.swap(1,3);
     rul.remove(0);
     rul.add(6);
-    mapped.add(50);
-    mapped.remove(0,5);
-    mapped.move(1,2);
 
     str = '';
-    for(v of rul) str += v + 1;
+    for(v of rul) str += v;
     assert.strictEqual(str,arr.join(''));
 
     d.detach();
@@ -210,7 +207,7 @@ t('Rul',function(){
     rul.add(6);
 
     str = '';
-    for(v of rul) str += v + 1;
+    for(v of rul) str += v;
     assert.notStrictEqual(str,arr.join(''));
 
   });

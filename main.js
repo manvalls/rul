@@ -6,8 +6,7 @@ var Detacher = require('detacher'),
     consumable = Symbol(),
     consumers = Symbol(),
     length = Symbol(),
-    list = Symbol(),
-    readOnly = Symbol();
+    list = Symbol();
 
 class Rul{
 
@@ -24,17 +23,14 @@ class Rul{
   }
 
   add(elem,index){
-    if(this[readOnly]) return;
     add.apply(this,arguments);
   }
 
   move(){
-    if(this[readOnly]) return;
     move.apply(this,arguments);
   }
 
   remove(index,num){
-    if(this[readOnly]) return;
     remove.apply(this,arguments);
   }
 
@@ -94,25 +90,6 @@ class Rul{
 
     for(i = 0;i < this[list].length;i++) arguments[0].call(thisArg,this[list][i],i);
     return new Detacher(detach,[arguments,this]);
-  }
-
-  map(map,thisArg){
-    var rul = new Rul(this[volatile]);
-
-    rul.mapFn = map;
-    rul.thisArg = thisArg;
-    rul[readOnly] = true;
-    
-    this.consume(mapAdd,remove,move,rul);
-    return rul;
-  }
-
-  readOnly(){
-    var rul = new Rul(this[volatile]);
-
-    this.consume(add,remove,move,rul);
-    rul[readOnly] = true;
-    return rul;
   }
 
   get consumable(){ return this[consumable]; }
@@ -178,13 +155,6 @@ function evaporate(rul){
 
 function detach(args,rul){
   rul[consumers].delete(args);
-}
-
-function mapAdd(elem,index){
-  try{ elem = this.mapFn.call(this.thisArg,elem); }
-  catch(e){ }
-
-  add.call(this,elem,index);
 }
 
 /*/ exports /*/
