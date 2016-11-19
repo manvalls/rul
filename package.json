@@ -1,6 +1,6 @@
 {
   "name": "rul",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "An abstraction designed to control any kind of list-like object",
   "main": "main.js",
   "dependencies": {
